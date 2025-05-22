@@ -4,14 +4,14 @@ LDFLAGS = -fpie -fPIE -fvisibility=hidden -g -Wl,-Ttext=0x0 -Wl,-section-alignme
 SRCS = $(wildcard *.c)
 OBJS = $(patsubst %.c, build/%.o, $(SRCS))
 
-TARGET = build/tv.elf
+TARGET = build/tv
 
 PREFIX ?= /usr/local
 BINDIR ?= $(PREFIX)/bin
 INCLUDEDIR ?= $(PREFIX)/include
 
 # Rules
-all: $(TARGET)
+all: $(TARGET) $(TARGET).elf
 
 build/%.o: %.c
 	mkdir -p build
@@ -20,7 +20,11 @@ build/%.o: %.c
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
-install: $(TARGET) 
+
+$(TARGET).elf: $(OBJS)
+	$(CC) $(LDFLAGS) -Wl,-oformat=elf32-littlearm $^ -o $@
+
+install: $(TARGET) $(TARGET).elf
 	mkdir -p $(BINDIR)
 	cp $(TARGET) $(BINDIR)
 
